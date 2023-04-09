@@ -4,15 +4,47 @@
 }
 
 body {
-  margin: 0;
   display: grid;
-  place-items: center;
+  margin: 0;
   min-height: 100vh;
   min-width: 320px;
+  place-items: center;
+}
+.board {
+  text-align: center;
+}
+.game {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 40px 0;
 }
 
-.board {
+.cell {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
+  place-content: center;
+  border: 3px solid white;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.cell.active {
+  background-color: lightblue;
+}
+
+.show-turn {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+button.reset {
+  padding: 10px 25px;
+  background-color: white;
+  border-radius: 20px;
+}
+
+h3 {
+  text-align: center;
 }

@@ -1,7 +1,10 @@
-function Cell ({ children }) {
+function Cell ({ children, handleClick, rowIndex, colIndex, isActive }) {
+  const cellClass = `cell ${isActive && 'active'}`
+
   return (
-    <div>{children}</div>
+    <div className={cellClass} onClick={() => handleClick(rowIndex, colIndex)}>
+      {children}
+    </div>
   )
 }
-
 export default Cell
