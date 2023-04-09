@@ -51,4 +51,10 @@ export const checkWinner = (board, setWinner) => {
       }
     }
   }
+  // check draw
+  let draw = true
+  board.forEach((row) => {
+    row.some((cell) => cell === null) && (draw = false)
+  })
+  draw && setWinner('draw')
 }
