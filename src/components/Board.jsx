@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import Cell from './Cell'
 import ShowWinner from './ShowWinner'
+import { checkWinner } from '../utils/checkWinner'
+import { loadBoardStorage, saveToStorage } from '../utils/handleStorage'
 
 const TURN = {
   X: '🟡',
@@ -8,8 +10,16 @@ const TURN = {
 }
 
 function Board () {
-  const [board, setBoard] = useState(Array.from(Array(6), () => new Array(7).fill(null)))
-  const [turn, setTurn] = useState('🟡')
+  const [board, setBoard] = useState(() => {
+    const { board: loadedBoard } = loadBoardStorage()
+    return !loadedBoard ? Array.from(Array(6), () => new Array(7).fill(null)) : loadedBoard
+  })
+
+  const [turn, setTurn] = useState(() => {
+    const { turn: loadedTurn } = loadBoardStorage()
+    return !loadedTurn ? '🟡' : loadedTurn
+  }
+  )
   const [winner, setWinner] = useState(null)
 
   const handleClick = (rowIndex, colIndex) => {
@@ -21,62 +31,33 @@ function Board () {
     setTurn(newTurn)
   }
 
-  const checkWinner = () => {
-    // check horizontal
-    for (let row = 0; row < board.length; row++) {
-      for (let col = 0; col < board[row].length - 3; col++) {
-        if (board[row][col] && board[row][col] === board[row][col + 1] && board[row][col] === board[row][col + 2] && board[row][col] === board[row][col + 3]) {
-          setWinner(board[row][col])
-        }
-      }
-    }
-    // check vertical
-    for (let row = 0; row < board.length - 3; row++) {
-      for (let col = 0; col < board[row].length; col++) {
-        if (board[row][col] && board[row][col] === board[row + 1][col] && board[row][col] === board[row + 2][col] && board[row][col] === board[row + 3][col]) {
-          setWinner(board[row][col])
-        }
-      }
-    }
-    // check diagonal
-    for (let row = 0; row < board.length - 3; row++) {
-      for (let col = 0; col < board[row].length - 3; col++) {
-        if (board[row][col] && board[row][col] === board[row + 1][col + 1] && board[row][col] === board[row + 2][col + 2] && board[row][col] === board[row + 3][col + 3]) {
-          setWinner(board[row][col])
-        }
-      }
-    }
-    // check diagonal
-    for (let row = 0; row < board.length - 3; row++) {
-      for (let col = 3; col < board[row].length; col++) {
-        if (board[row][col] && board[row][col] === board[row + 1][col - 1] && board[row][col] === board[row + 2][col - 2] && board[row][col] === board[row + 3][col - 3]) {
-          setWinner(board[row][col])
-        }
-      }
-    }
-  }
-
   const resetGame = () => {
     setWinner(null)
-    setTurn('✖️')
+    setTurn('🟡')
     setBoard(Array.from(Array(6), () => new Array(7).fill(null)))
   }
 
   useEffect(() => {
-    checkWinner()
-  }, [board])
+    checkWinner(board, setWinner)
+    saveToStorage(board, turn)
+  }, [board, Cell])
 
   return (
     <main className='board'>
       {winner && <ShowWinner winner={winner} resetGame={resetGame} />}
       <section className='game'>
-        {
-          board.map((row, rowIndex) =>
-            row.map((_, colIndex) =>
-              <Cell key={colIndex} handleClick={handleClick} rowIndex={rowIndex} colIndex={colIndex}>{board[rowIndex][colIndex]}</Cell>
-            )
-          )
-        }
+        {board.map((row, rowIndex) =>
+          row.map((_, colIndex) => (
+            <Cell
+              key={colIndex}
+              handleClick={handleClick}
+              rowIndex={rowIndex}
+              colIndex={colIndex}
+            >
+              {board[rowIndex][colIndex]}
+            </Cell>
+          ))
+        )}
       </section>
       <h3>TURN</h3>
       <section className='show-turn'>

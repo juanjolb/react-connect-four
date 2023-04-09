@@ -43,6 +43,7 @@ button.reset {
   padding: 10px 25px;
   background-color: white;
   border-radius: 20px;
+  cursor: pointer;
 }
 
 h3 {
